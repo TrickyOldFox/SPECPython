@@ -78,7 +78,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -226,7 +226,7 @@
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -237,13 +237,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QTableWidget" name="tableWidget">
-           <column>
-            <property name="text">
-             <string>Lines</string>
-            </property>
-           </column>
-          </widget>
+          <widget class="QPlainTextEdit" name="plainTextEdit"/>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -264,31 +258,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <item>
-            <widget class="QLineEdit" name="lineEdit_3">
-             <property name="text">
-              <string>1</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_11">
-             <property name="text">
-              <string>Edit Number of Lines</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QTableWidget" name="tableWidget_2">
-           <column>
-            <property name="text">
-             <string>Lines</string>
-            </property>
-           </column>
-          </widget>
+          <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -309,25 +279,10 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <item>
-            <widget class="QLineEdit" name="lineEdit">
-             <property name="text">
-              <string>1</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_7">
-             <property name="text">
-              <string>Edit Number of Lines</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
           <widget class="QTableWidget" name="tableWidget_3">
+           <property name="lineWidth">
+            <number>1</number>
+           </property>
            <column>
             <property name="text">
              <string>Coords</string>

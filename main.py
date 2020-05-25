@@ -16,6 +16,13 @@ import sys
 from random import randint
 import numpy as np
 import AnalizeTool
+import subprocess
+
+def copy(s):
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        subprocess.Popen(['clip'], stdin=subprocess.PIPE, encoding='utf8').communicate(s)
+    else:
+        raise Exception('Platform not supported')
 
 global Channels
 
@@ -60,8 +67,8 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
     update_channels()
     
     #File Channels and variables
-    fname=''
-    fname2=''
+    fname=" "
+    fname2=" "
     FileChannel =[]
     FileChannel2 = []
     FileChannelInterpolated = []
@@ -97,8 +104,6 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
         
         self.pushButton_6.clicked.connect(self.ClearTable_2)
         self.pushButton_10.clicked.connect(self.ClearTable)
-        self.pushButton_7.clicked.connect(self.SetRowsTable_2)
-        self.pushButton_11.clicked.connect(self.SetRowsTable)
     
         self.pushButton_8.clicked.connect(self.SearchLinesInSpectreInit)
         self.pushButton_5.clicked.connect(self.DeleteLinesFromSpectreInit)
@@ -195,12 +200,15 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
         if self.FileChannel == []:
             print("There is no data file openned")
         else:
-            for i in range(self.tableWidget_2.rowCount()):
+            Text = self.plainTextEdit_2.toPlainText()
+            Text = Text.splitlines()
+            print(Text)
+            for i in range(len(Text)):
                 try:
-                    self.LinesToDelete.append(float(self.tableWidget_2.item(i,0).text()))
+                    self.LinesToDelete.append(float(Text[i]))
                 except:
                     print("Wrong type of input in Lines to Search")
-            if self.LinesToDelete == []: print("Lines to Search list is empty") 
+            if self.LinesToDelete == []: print("Lines to Delete list is empty") 
             else:
                 self.LinesToDelete = sorted(self.LinesToDelete)
                 if self.LinesToDelete[0] < self.FileChannel[0][0] or self.LinesToDelete[-1] > self.FileChannel[0][-1]:
@@ -232,20 +240,33 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
         if self.FileChannel == []:
             print("There is no data file openned")
         else:
-            for i in range(self.tableWidget.rowCount()):
+            Text = self.plainTextEdit.toPlainText()
+            Text = Text.splitlines()
+            print(Text)
+            for i in range(len(Text)):
                 try:
-                    self.LinesToSearch.append(float(self.tableWidget.item(i,0).text()))
+                    self.LinesToSearch.append(float(Text[i]))
                 except:
                     print("Wrong type of input in Lines to Search")
+            print(self.LinesToSearch)
+            self.LinesToSearch = sorted(self.LinesToSearch)
+            while (self.LinesToSearch[0] < self.FileChannel[0][0]):
+                self.LinesToSearch = self.LinesToSearch[1:len(self.LinesToSearch)]
+            while (self.LinesToSearch[-1] > self.FileChannel[0][-1]):
+                self.LinesToSearch = self.LinesToSearch[0:len(self.LinesToSearch)-1]
             if self.LinesToSearch == []: print("Lines to Search list is empty")
-            else:
-                self.LinesToSearch = sorted(self.LinesToSearch)
-                if self.LinesToSearch[0] < self.FileChannel[0][0] or self.LinesToSearch[-1] > self.FileChannel[0][-1]:
-                    print("Lines to Search are out of bounds")
-                else:               
-                    self.AverageDeriviative, self.AverageFon, self.AverageFluctuation, self.FileChannel, self.PossibleLines = \
-                                AnalizeTool.SearchLinesInSpectre(self.FileChannel, self.AVG, self.Precision, self.FilterRangeMultiplier, self.Filter, self.LinesSearchRange, self.LinesToSearch)
-                    self.PlotLinesToSearch()
+            else:             
+                self.AverageDeriviative, self.AverageFon, self.AverageFluctuation, self.FileChannel, self.PossibleLines = \
+                    AnalizeTool.SearchLinesInSpectre(self.FileChannel, self.AVG, self.Precision, self.FilterRangeMultiplier, self.Filter, self.LinesSearchRange, self.LinesToSearch)
+                    #self.PlotLinesToSearch()
+                DataToClipBoard = ""
+                for i in self.PossibleLines:
+                    DataToClipBoard += "%.1f" % i[0]
+                    DataToClipBoard += "\t"   
+                    DataToClipBoard += "%.4f" % (i[1]-i[2])
+                    DataToClipBoard += "\n"
+                print(DataToClipBoard)
+                copy(DataToClipBoard)
         
     def Interpolation(self):
         if self.FileChannel == []:
@@ -291,6 +312,7 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
         for i in range(len(self.FileChannel[0])-k):
             self.FileChannel[0][k+i] = self.InterpolationListFiltered[-1][1] + (c/a)*(self.FileChannel[0][k+i]-self.InterpolationListFiltered[-1][0])
         self.Plot_from_file()
+        self.Plot_from_file2()
         for i in range(self.tableWidget.rowCount()):
             item = QtGui.QTableWidgetItem()
             item.setData(QtCore.Qt.EditRole, self.InterpolationListFiltered[i][1])
@@ -301,28 +323,14 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
         self.tableWidget_3.setRowCount(0) 
         self.InterpolationPoints = []
     def ClearTable_2(self):
-        self.tableWidget_2.setRowCount(0)
-        self.SetRowsTable_2()
+        self.plainTextEdit_2.clear()
+        self.LinesToDelete = []
     def ClearTable(self):
-        self.tableWidget.setRowCount(0)
-        self.SetRowsTable() 
-        
-    def SetRowsTable_2(self):
-        try:
-            a = int(self.lineEdit.text())
-        except:
-            print("Wrong type of data in the number of rows")
-            a=0
-        self.tableWidget_2.setRowCount(a)
-    def SetRowsTable(self):
-        try:
-            a = int(self.lineEdit_3.text())
-        except:
-            print("Wrong type of data in the number of rows")
-            a=0
-        self.tableWidget.setRowCount(a)
+        self.plainTextEdit.clear()
+        self.LinesToSearch = []
         
     def GetInterpolationPoint(self, event):
+        #Interpolate
         if self.state == 0:
             if event.buttons() == QtCore.Qt.MidButton:
                 Point = self.p.vb.mapSceneToView(event.scenePos())
@@ -334,27 +342,17 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
                 item.setData(QtCore.Qt.EditRole, element[0])
                 self.tableWidget_3.setItem(rows,0,item)
                 print("The point has been captured")
+        #Delete
         if self.state == 1:
             if event.buttons() == QtCore.Qt.MidButton:
                 Point = self.p.vb.mapSceneToView(event.scenePos())
-                self.InterpolationPoints.append((Point.x(),Point.y()))
-                rows = self.tableWidget_2.rowCount()
-                self.tableWidget_2.setRowCount(rows+1)
-                element = self.InterpolationPoints[-1]
-                item = QtGui.QTableWidgetItem()
-                item.setData(QtCore.Qt.EditRole, element[0])
-                self.tableWidget_2.setItem(rows,0,item)
+                self.plainTextEdit_2.appendPlainText("%.1f" % Point.x()) 
                 print("The point has been captured")
+        #Search
         if self.state == 2:
             if event.buttons() == QtCore.Qt.MidButton:
                 Point = self.p.vb.mapSceneToView(event.scenePos())
-                self.InterpolationPoints.append((Point.x(),Point.y()))
-                rows = self.tableWidget.rowCount()
-                self.tableWidget.setRowCount(rows+1)
-                element = self.InterpolationPoints[-1]
-                item = QtGui.QTableWidgetItem()
-                item.setData(QtCore.Qt.EditRole, element[0])
-                self.tableWidget.setItem(rows,0,item)
+                self.plainTextEdit.appendPlainText("%.1f" % Point.x()) 
                 print("The point has been captured")
     
     def Open_action(self):
@@ -364,30 +362,41 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
             self.stackedWidget.setCurrentIndex(1)
             self.FileData, self.FileChannel = AnalizeTool.csv_open(self.fname[0])
             #print(self.FileChannel)
-        if self.FileData == 0: print("Error acured during read from file")
-        else: self.Plot_from_file()
+        if self.FileData == 0:
+            print("Error acured during read from file")
+            self.fname = " "
+        self.Plot_from_file()
         
     def Save_as_action(self):
         fileName = QtWidgets.QFileDialog.getSaveFileName(self, "Save", "", "csv Files (*.csv)")
-        AnalizeTool.csv_save(fileName[0], self.FileChannel)
-        print(fileName);
+        if len(self.fname[0])!=0:
+            AnalizeTool.csv_save(fileName[0], self.FileChannel)
+            print(fileName);
     
     def Compete_action(self):
-        self.fname2 = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', 'c:\\', "*.csv" )
-        if len(self.fname[0])!=0:
-            self.stackedWidget.setCurrentIndex(1)
-            self.FileData2, self.FileChannel2 = AnalizeTool.csv_open(self.fname2[0])
-            #print(self.FileChannel)
-        if self.FileData2 == 0: print("Error acured during read from file")
-        else: self.Plot_from_file2()
+        if self.fname2 == " ":
+            self.fname2 = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', 'c:\\', "*.csv" )
+            if len(self.fname[0])!=0:
+                self.stackedWidget.setCurrentIndex(1)
+                self.FileData2, self.FileChannel2 = AnalizeTool.csv_open(self.fname2[0])
+                #print(self.FileChannel)
+            if self.FileData2 == 0: 
+                print("Error acured during read from file")
+                self.fname2 = " "
+            else: 
+                self.Plot_from_file2()
+        else:
+            self.fname2 = " "
+            self.Plot_from_file()
     
     def Plot_from_file2(self):
-        if self.fname2 != '':
+        if self.fname2 != " ":
             self.data_line_4 = self.graphicsView_3.plot(self.FileChannel2[0],self.FileChannel2[1], pen=(0,0,255))
    
     def Plot_from_file(self):
         self.graphicsView_3.clear()
-        self.data_line_3 = self.graphicsView_3.plot(self.FileChannel[0],self.FileChannel[1],pen=self.Pen)
+        if self.fname != " ":
+            self.data_line_3 = self.graphicsView_3.plot(self.FileChannel[0],self.FileChannel[1],pen=self.Pen)
         
     #ADC Moadule
     def ADC_init(self):
