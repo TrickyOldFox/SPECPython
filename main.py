@@ -224,15 +224,9 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
                     
     def PlotLinesToSearch(self):
         for i in self.PossibleLines:
-            a=i[1]
-            b=i[2]
-            PlotX=[]
-            PlotY=[]
-            while a>b:
-                PlotX.append(i[0])
-                PlotY.append(b)
-                b+=0.0001
-                self.data_line_4 = self.graphicsView_3.plot(PlotX,PlotY,pen=(0,255,0))
+            PlotX = [i[0],i[0]]
+            PlotY = [i[2],i[1]]
+            self.data_line_4 = self.graphicsView_3.plot(PlotX,PlotY,pen=(0,255,0))
         print("Lines to Search plotting is complete")
         
     def SearchLinesInSpectreInit(self):
@@ -258,7 +252,7 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
             else:             
                 self.AverageDeriviative, self.AverageFon, self.AverageFluctuation, self.FileChannel, self.PossibleLines = \
                     AnalizeTool.SearchLinesInSpectre(self.FileChannel, self.AVG, self.Precision, self.FilterRangeMultiplier, self.Filter, self.LinesSearchRange, self.LinesToSearch)
-                    #self.PlotLinesToSearch()
+                self.PlotLinesToSearch()
                 DataToClipBoard = ""
                 for i in self.PossibleLines:
                     DataToClipBoard += "%.1f" % i[0]
