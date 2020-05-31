@@ -15,6 +15,7 @@ def csv_open(Path):
     s = tuple(['seconds','values','chanel'])
     seconds = []
     values = []
+    reader = []
     with open(Path) as csvFile:
         reader = csv.DictReader(csvFile, fieldnames = s, delimiter = ';',  dialect='excel')
         for row in reader:

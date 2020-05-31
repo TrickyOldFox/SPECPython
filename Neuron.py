@@ -6,7 +6,6 @@ Created on Mon May 25 12:08:38 2020
 """
 
 import numpy as np
-import csv
 import AnalizeTool
 from scipy import special as sp
 

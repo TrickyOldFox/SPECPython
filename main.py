@@ -8,10 +8,7 @@ ToDoList :
 '''
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from pyqtgraph import plot
-import pyqtgraph as pg
 import mainwindow_design
-import os
 import sys
 from random import randint
 import numpy as np
@@ -67,8 +64,8 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
     update_channels()
     
     #File Channels and variables
-    fname=" "
-    fname2=" "
+    fname=""
+    fname2=""
     FileChannel =[]
     FileChannel2 = []
     FileChannelInterpolated = []
@@ -307,7 +304,7 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
             self.FileChannel[0][k+i] = self.InterpolationListFiltered[-1][1] + (c/a)*(self.FileChannel[0][k+i]-self.InterpolationListFiltered[-1][0])
         self.Plot_from_file()
         self.Plot_from_file2()
-        for i in range(self.tableWidget.rowCount()):
+        for i in range(self.tableWidget_3.rowCount()):
             item = QtGui.QTableWidgetItem()
             item.setData(QtCore.Qt.EditRole, self.InterpolationListFiltered[i][1])
             self.tableWidget_3.setItem(i,0,item)
@@ -356,42 +353,44 @@ class mainwindow(QtWidgets.QMainWindow, mainwindow_design.Ui_MainWindow):
             self.stackedWidget.setCurrentIndex(1)
             self.FileData, self.FileChannel = AnalizeTool.csv_open(self.fname[0])
             #print(self.FileChannel)
-        if self.FileData == 0:
+        if self.FileData == []:
             print("Error acured during read from file")
-            self.fname = " "
-        self.Plot_from_file()
+            self.fname = ""
+        else:
+            self.Plot_from_file()
         
     def Save_as_action(self):
         fileName = QtWidgets.QFileDialog.getSaveFileName(self, "Save", "", "csv Files (*.csv)")
-        if len(self.fname[0])!=0:
-            AnalizeTool.csv_save(fileName[0], self.FileChannel)
-            print(fileName);
+        if len(fileName[0])!=0:
+            if self.fname != "":
+                AnalizeTool.csv_save(fileName[0], self.FileChannel)
     
     def Compete_action(self):
-        if self.fname2 == " ":
+        if self.fname2 == "":
             self.fname2 = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', 'c:\\', "*.csv" )
-            if len(self.fname[0])!=0:
+            if len(self.fname2[0])!=0:
                 self.stackedWidget.setCurrentIndex(1)
                 self.FileData2, self.FileChannel2 = AnalizeTool.csv_open(self.fname2[0])
-                #print(self.FileChannel)
-            if self.FileData2 == 0: 
+                #print(self.FileChannel2)
+            if self.FileData2 == []: 
                 print("Error acured during read from file")
-                self.fname2 = " "
+                self.fname2 = ""
             else: 
                 self.Plot_from_file2()
         else:
-            self.fname2 = " "
             self.Plot_from_file()
     
     def Plot_from_file2(self):
-        if self.fname2 != " ":
+        if self.fname2 != "":
             self.data_line_4 = self.graphicsView_3.plot(self.FileChannel2[0],self.FileChannel2[1], pen=(0,0,255))
    
     def Plot_from_file(self):
-        self.graphicsView_3.clear()
-        if self.fname != " ":
+        if self.fname != "":
+            self.graphicsView_3.clear()
             self.data_line_3 = self.graphicsView_3.plot(self.FileChannel[0],self.FileChannel[1],pen=self.Pen)
-        
+            self.fname2 = ""
+            
+            
     #ADC Moadule
     def ADC_init(self):
         self.ADC_on = True
